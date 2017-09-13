@@ -7,7 +7,7 @@ menu = "main"
 
 ## Monitoring Presidential Information Streams
 
-The initial project of the Data for Democracy Lab @ UVA, The Public Presidency Project, began to form after a series of conversations with people from a variety of perspectives who consistently communicated: "I can't read/watch the news anymore. It's too...[exhausting, depressing, anger-inducing, polarizing, ... ]."
+The initial project of the Data for Democracy Lab @ UVA, The Public Presidency Project, began to form after a series of conversations with people from a variety of perspectives who consistently communicated: "I can't read/watch the news anymore. It's too...[exhausting, depressing, distracting, anger-inducing, polarizing, ... ]."
 
 That's a problem. It's not like democratic citizens have ever been acclaimed for their political attentiveness, but at the end of the day, we need to have some idea of what's going on. Accountability, you know.
 
