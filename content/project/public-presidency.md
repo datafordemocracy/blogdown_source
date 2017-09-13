@@ -1,7 +1,7 @@
 +++
 title = "The Public Presidency"
 description = "Imagining new ways to engage political news... starting with the presidency"
-date = 2014-11-18T02:13:50Z
+date = 2017-09-13T02:13:50Z
 menu = "main"
 +++
 

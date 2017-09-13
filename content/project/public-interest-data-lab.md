@@ -1,7 +1,7 @@
 +++
 title = "Public Interest Data Lab"
 description = "Public Service through Data"
-date = 2014-11-18T02:13:50Z
+date = 2017-09-12T02:13:50Z
 +++
 
 ## Community Engagement and Data Praxis
