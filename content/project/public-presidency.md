@@ -5,7 +5,7 @@ date = 2014-11-18T02:13:50Z
 menu = "main"
 +++
 
-## Monitoring Presidential News Streams
+## Monitoring Presidential Information Streams
 
 The initial project of the Data for Democracy Lab @ UVA, The Public Presidency Project, began to form after a series of conversations with people from a variety of perspectives who consistently communicated: "I can't read/watch the news anymore. It's too...[exhausting, depressing, anger-inducing, polarizing, ... ]."
 
