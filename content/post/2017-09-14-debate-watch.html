@@ -16,7 +16,7 @@ tags: []
 <p>My iniital corpus is the combined speech of Clinton and of Trump in each of their debate appearces, pulled from <a href="http://www.presidency.ucsb.edu/debates.php">UCSB’s The American Presidency Project</a>. Because I started this after the primaries, I ended up ignoring the rhetoric of the also-rans.</p>
 <p>I used <a href="https://github.com/hadley/rvest">rvest</a> to acquire the data - you can see the script <a href="https://github.com/mclaibourn/debates2016">acquire_debates.R</a> on GitHub. Probably the most widely used package for working with a corpus in R is <a href="https://cran.r-project.org/web/packages/tm/index.html">tm</a>, but here I’m using a newer package, <a href="https://github.com/kbenoit/quanteda">quanteda</a>. I generated a corpus, assigned document names and variables, and started exploring the text.</p>
 <p>Let’s start with the complexity of the speech. The Flesch-Kincaid readability scores is only one of the readability measures available in quanteda. It’s normalized to grade level reading and captures how difficult a text is to understand. It’s a function of average sentence length and average:</p>
-<p><span class="math inline">\(0.39\left(\frac{totalwords}{totalsentences}\right)+11.8\left(\frac{totalsyllables}{totalwords}\right)-15.59\)</span></p>
+<p><span class="math display">\[0.39\left(\frac{total\,words}{total\,sentences}\right)+11.8\left(\frac{total\,syllables}{total\,words}\right)-15.59\]</span></p>
 <pre class="r"><code>library(tidyverse)
 library(quanteda)
 library(scales)
