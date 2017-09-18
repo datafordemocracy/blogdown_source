@@ -1,0 +1,109 @@
+---
+title: Debating the Issues?
+author: Michele Claibourn
+date: '2017-09-18'
+slug: debating-the-issues
+categories: []
+tags: [R, stm]
+---
+
+## Debate Content, Part II
+
+The prior [post on debate content](../../17/2017-09-17-watch-what-you-say/) didn't suggest much policy or issue-oriented actual debate. Nevertheless, here's one last attempt to get at the substance of the presidential election debates.
+
+I'm starting by estimating a mixed membership clustering algorithm, a topic model, to see if identifiable topics arise from the word usage in the debates. The structural topic model, provided in the [stm](https://github.com/bstewart/stm) package, will estimate a chosen number of topics, provide the document proportions for each topic, and the word probabilities for each
+topic. Let's look at some of those. As before, the full script is on [GitHub](https://github.com/mclaibourn/debates2016).
+
+```{r message=FALSE}
+rm(list=ls())
+rm(list=ls())
+library(tidyverse)
+library(quanteda)
+library(stm)
+
+setwd("../../../dataForDemocracy/debate2016analysis/")
+load("debateTopics.RData") 
+```
+I loaded the image file created from running the code in this post; the model takes a little time to run and I want to call the already generated results. Still, here are the steps to set up the model:
+```{r eval=FALSE}
+# extract docvars to be converted to stm format
+debateDocVars <- docvars(debate16corpus) 
+debateDocVars$speech <- debates16$speech
+
+# define words to remove, stopwords (except for pronouns) and moderators
+moderators <- c("chris", "anderson", "martha", "lester", "elaine")
+otherStop("applause", "laughter", "crosstalk", "laughther")
+debatedfm <- dfm(debate16corpus, 
+                 remove = c(stopwords("english"), moderators, otherStop),
+                 remove_punct = TRUE,
+                 stem = TRUE)
+debatedfm <- dfm_trim(debatedfm, min_count = 2) # remove words that occur less than twice to reduce the sparsity of the document-feature matrix
+
+# put text in format for stm
+debOut <- convert(debatedfm, to = "stm", 
+                  docvars = debateDocVars)
+```
+Now I'm ready to estimate a topic model. The stm package has some lovely built-in functions for exploring reasonable values of k (the number of topics), so I use those:
+```{r eval=FALSE}
+# searchK estimates topic exclusivity, coherence; model likelihood, residuals for each k
+debEval <- searchK(debOut$documents, debOut$vocab, K = seq(10,75,5), 
+                   prevalence = ~ as.factor(party) + as.factor(season), 
+                   data = debOut$meta, init.type = "Spectral")
+plot(debEval) # I like k = 25
+
+# estimate the stm with k=25 and document covariates "party" and "season"
+debFit25 <- stm(debOut$documents, debOut$vocab, K = 25,
+              prevalence = ~ as.factor(party) + as.factor(season), max.em.its = 75,
+              data = debOut$meta, init.type = "Spectral")
+
+```
+Let's look at some of the results.
+```{r message=FALSE}
+# Topic quality
+topicQuality(debFit25, debOut$documents)
+```
+This plots the exclusivity of each topic by the coherence of each topic. 
+By coherence, we mean that high-probability words for the topic tend to co-occur within documents. More positive values (or less negative values) indicate more coherent topics. 
+
+By exclusivity, we mean that the top words for a topic are unlikely to appear as a top word of the other topics; if words with high probability under topic 1 have low probabilities under other topics, then we say that topic 1 is exclusive.
+
+Topic 3 scores particularly low on coherence, Topic 10 is relatively low as well; Topics 13, 23, and 8 score relatively low on exclusivity. 
+```{r message=FALSE}
+# Topic prevalence
+plot(debFit25, type = "summary", labeltype="frex")
+```
+Based on the 25 topics the model generates, the most common themes across the primary and general election season debates were those captured in Topics 8, 13, 21, and 23 -- which were also less exclusive topics.
+
+What are these topics? The topic prevlance plot provides three heavily-associated words, which is a common approach for generating a sense of the topic substance. But there are multiple ways of thinking about what words are associated with a topic.
+```{r message=FALSE}
+# Topic top words
+labelTopics(debFit25)
+```
+The labelTopics function gives us some options, including the highest probability words, or those that appear most frequently in the topic. But those really frequent words tend to appear in multiple topics. Instead, I like the FREX, or frequency-exclusivity weighted word lists. Honestly, this is one of less intuitive set of topics I've seen. Topic 7 (eminent domain, keystone pipeline) I recall coming up in the debates; Topic 17 is clearly Michigan-related -- the water crisis, the auto industry; Topic 22 looks to be aobut immigration reform. But many of these look like a jumble. 
+
+While to really get at this would require additional iteration, I'm inclined to believe that the debates were, in fact, composed of many random streams of rhetoric. Not one of our most laudable civic moments. Still, the LDAvis package can generate a fun dynamic visualization of topic models, so I tried it out.
+```{r eval=FALSE}
+library(LDAvis)
+library(servr)
+
+toLDAvis(mod=debFit25, docs=debOut$documents, R=20, out.dir = "debatesLDAvis", open.browser = FALSE) # generates a webpage
+```
+You can see the resulting visualization [here](http://people.virginia.edu/~mpc8t/rhetoric2016/debatesLDAvis/). 
+
+```{r message=FALSE}
+# Topic prevalence by debate: put topic proportions in a data frame
+debateTopics <- as.data.frame(debFit25$theta)
+debateTopics <- cbind(debateTopics, debates16)
+
+# reshape the data frame
+topicsLong <- debateTopics %>% 
+  select(V1:V25, date, party) %>% 
+  gather(topic, value, -date, -party)
+
+# and graph the topics for the four general election debates
+topicsLongGeneral <- topicsLong %>% filter(date>as.Date("2016-09-01"))
+p <- ggplot(topicsLongGeneral, aes(x=topic, y=value, fill=party))
+p + geom_bar(stat="identity") + facet_wrap(~date) + 
+  scale_fill_manual(values=c("blue3", "orange3"))
+```
+In this case, each candidate's rhetoric is dominated by a single topic, which changes from debate to debate. I find this plausible (that the candidates were talking past each other, and responding to different pressures as the campaign wore on), but this clearly needs some further iterations to pin down fully.

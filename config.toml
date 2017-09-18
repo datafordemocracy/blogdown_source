@@ -6,6 +6,7 @@ copyright = "Michele Claibourn"
 disqusShortname = ""
 googleAnalytics = ""
 publishDir = "../datafordemocracy.github.io"
+ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
 
 [Author]
     name = "Data for Democracy @ UVA"

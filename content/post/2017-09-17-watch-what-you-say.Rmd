@@ -1,5 +1,5 @@
 ---
-title: Watch What You Say
+title: Watching What You Say
 author: Michele Claibourn
 date: '2017-09-17'
 slug: watch-what-you-say
@@ -25,9 +25,9 @@ load("debateSpeech2016.RData") # the corpus as created in acquire_debates.R
 candcorpus <- corpus_subset(debate16corpus, speaker=="HRC" | speaker=="DJT")
 
 # create document feature matrix
+otherStop <- c("applause", "laughter", "crosstalk", "laughther")
 debatedfm <- dfm(candcorpus, 
-               remove = c(stopwords("english"), 
-                          "applause", "laughter", "crosstalk", "laughther"),
+               remove = c(stopwords("english"), otherStop),
                remove_punct = TRUE,
                remove_numbers = TRUE,
                verbose = TRUE)
@@ -58,31 +58,22 @@ For DJT we have: going, country, people, say, look, great, and many; with some o
 
 One last angle (for this post) -- another simple way to get a snapshot of the debate substance is to explore key-words-in-context for target words, like so:
 ```{r message=FALSE}
-# subsetting the corpus
-hrccorpus <- corpus_subset(debate16corpus, speaker=="HRC")
-djtcorpus <- corpus_subset(debate16corpus, speaker=="DJT")
-
-
-#########################
-# Examining the Substance
-# (quanteda)
-#########################
 ### key words in context
-kwic(hrccorpus, "family", 2)
-kwic(djtcorpus, "family", 2)
+kwic(corpus_subset(candcorpus, speaker=="HRC"), "family", 2)
+kwic(corpus_subset(candcorpus, speaker=="DJT"), "family", 2)
 ```
 Clinton's use of the word family centered around paid family leave, worklife balance, military families, and the like. Trump's use of family, by contrast, almost always referenced his own.
 
 How about immigration? Here I'll use a regular expression to extract multiple forms of the word.
 ```{r message=FALSE}
-kwic(hrccorpus, "immig", 2, "regex")
-kwic(djtcorpus, "immig", 2, "regex")
+kwic(corpus_subset(candcorpus, speaker=="HRC"), "immig", 2, "regex")
+kwic(corpus_subset(candcorpus, speaker=="DJT"), "immig", 2, "regex")
 ```
 It's a pain that the words after the keyword wrapped around in the console for Clinton's corpus, but it's pretty clear her primary references to immigration or immigrants centered on comprehensive immigration reform. She made some references to undocumented immigrants, but never used the language of "illegal" that characterizes Trump's language.
 
 Finally, for something a little more light hearted:
 ```{r message=FALSE}
-kwic(hrccorpus, "hands", 3)
-kwic(djtcorpus, "hands", 3)
+kwic(corpus_subset(candcorpus, speaker=="HRC"), "hands", 3)
+kwic(corpus_subset(candcorpus, speaker=="DJT"), "hands", 3)
 ```
 That's right. Trump kept bringing up his wee hands in that March primary debate. Hahaha...ha?
